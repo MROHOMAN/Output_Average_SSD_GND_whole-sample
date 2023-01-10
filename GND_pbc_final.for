@@ -115,6 +115,10 @@ c
       
       character*160 filename
       integer length1, I, flag
+	  
+	  integer NincrF, NincrG
+      save    NincrF, NincrG
+	  
       
       numel_aba  = nint (props(1))
       numqpt_aba = nint (props(2))
@@ -129,6 +133,8 @@ c---------------------------------------------------------------------72
 c      if ( (time(2) .eq. 0.0) .and. (kinc .eq. 0) ) then
 c         if ( (noel .eq. 1) .and. (npt .eq. 1) ) then
 c         if ( (kelem .eq. 1) .and. (npt .eq. 1) ) then
+            NincrF = 0
+            NincrG = 0
             call Initializegrain(noel)
             call SetUpCrystalProps2(props, nprops, numqpt, numel)
 c         endif
@@ -16822,11 +16828,11 @@ c=====================================================================72
       include 'params_xtal.inc'
       include 'numbers.inc'
       
-      integer is, numslip, incr, noel, npt, totEle
+      integer is, numslip, incr, noel, npt, totEle, NincrF
       real*8  forden(MAX_SLIP)
       real*8  density, totdensity, dentot, avgtot
       
-      save    dentot, avgtot
+      save    dentot, avgtot, NincrF
 c
 c---------------------------------------------------------------------72
 c
@@ -16846,8 +16852,13 @@ c----------------------------------------------------------------------
 	  
       if(noel .eq. totEle) then  
 		avgtot = dentot / real(totEle)
-		write(XTAL_G1,*) 'Increment no.    =',incr
-		write(XTAL_G1,*) 'average SSD for the whole sample     =',avgtot
+		!write(XTAL_G1,*) 'Increment no.    =',incr
+		!write(XTAL_G1,*) 'NincrF before if statement    =',NincrF
+		if(incr .gt. NincrF) then
+			NincrF = incr
+			!write(XTAL_G1,*) 'NincrF     =',NincrF
+			write(XTAL_G1,*)'average SSD for the whole sample     =', avgtot
+		endif
       endif
 c----------------------------------------------------------------------     
 
@@ -16866,11 +16877,11 @@ c=====================================================================72
       include 'params_xtal.inc'
       include 'numbers.inc'
       
-      integer is, numslip, incr, noel, npt, totEle 
+      integer is, numslip, incr, noel, npt, totEle, NincrG 
       real*8  gndden(MAX_SLIP)
       real*8  fdensity, totfdensity, fdentot, favgtot
       
-      save    fdentot, favgtot
+      save    fdentot, favgtot, NincrG
 c
 c---------------------------------------------------------------------72
 c
@@ -16890,8 +16901,12 @@ c----------------------------------------------------------------------
       
       if(noel .eq. totEle) then  
         favgtot = fdentot / real(totEle)
-        write(XTAL_G1,*) 'Increment no.    =',incr
-		write(XTAL_G1,*)'average GND for the whole sample     =', favgtot
+		!write(XTAL_G1,*) ' NincrG    =',NincrG
+		if(incr .gt. NincrG) then			
+			NincrG = incr
+			!write(XTAL_G1,*) ' NincrG    =',NincrG
+			write(XTAL_G2,*)'average GND for the whole sample     =', favgtot
+        endif
       endif
 c----------------------------------------------------------------------     
 
